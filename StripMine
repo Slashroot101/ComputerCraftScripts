@@ -1,0 +1,92 @@
+dirt = "minecraft:cobblestone"
+
+local allowedBlocks = {4, 3, 1, 24}
+
+local function Ternary(cond, T, F)
+	if cond then return T else return F end
+end
+
+local function HasValue(tab, val)
+	for index, value in ipairs(tab) do
+			if value == val then
+					return true
+			end
+	end
+
+	return false
+end
+
+local function FindItemInInventory(idString)
+	for i=1, 16 do
+		local data = turtle.getItemDetail(i)
+		if data ~= nil and idString == data.name then
+			return i;
+		end
+	end
+end
+
+local function EquipItem(inventorySlotNumber)
+
+	local function Equip(direction)
+		if direction == 1 then
+			turtle.equipRight()
+		end
+	
+		if direction == -1 then
+			turtle.equipLeft()
+		end
+	end
+
+	local currentSlot = turtle.getSelectedSlot()
+	local iterator = Ternary(currentSlot < inventorySlotNumber, 1, -1)
+	while turtle.getSelectedSlot() ~= inventorySlotNumber and turtle.getSelectedSlot() ~= 0 and turtle.getSelectedSlot() ~= 16 do
+		print(turtle.getSelectedSlot())
+		Equip(iterator)
+	end
+	return (turtle.getSelectedSlot() and inventorySlotNumber)
+end
+
+local function MineForward()
+	turtle.refuel()
+	if turtle.detect() == true then
+		turtle.dig()
+		turtle.digUp()
+	end
+	turtle.forward()
+	turtle.digUp()
+	if turtle.detectDown() == false then
+		local itemLocation = FindItemInInventory(dirt)
+		print(itemLocation)
+		EquipItem(itemLocation)
+		turtle.placeDown()
+	end
+	print("Moving")
+end
+
+while true do
+	for i = 0, 20, 1 do
+		for j = 0, 20, 1 do
+			MineForward()
+		end
+		firstTurn = turtle.turnLeft()
+		secondTurn = turtle.turnLeft()
+		print("First turn: ")
+		print(firstTurn)
+		print("Second turn:")
+		print(secondTurn)
+		for z = 0, 20, 1 do
+			print(z)
+			MineForward()
+		end
+		turtle.turnRight()
+		MineForward()
+		MineForward()
+		MineForward()
+		turtle.turnRight();
+	end
+
+	turtle.turnLeft()
+	for i = 0, 400, 1 do
+		MineForward()
+	end
+end
